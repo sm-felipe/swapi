@@ -1,3 +1,3 @@
 ###starting the database
 
-    docker compose up swapi-db
+    docker-compose up swapi-db
