@@ -15,6 +15,12 @@ import reactor.core.publisher.Mono;
 @Component
 public class PlanetGateway {
 
+    private final WebClient client;
+
+    public PlanetGateway(WebClient client) {
+        this.client = client;
+    }
+
     public Mono<PlanetDTO> save(PlanetDTO planetDTO) {
 
 //        WebClient client = WebClient.create("locahost");
@@ -23,7 +29,7 @@ public class PlanetGateway {
     }
 
     public Mono<PlanetDTO> findById(Long id) {
-        WebClient client = WebClient.create("http://127.0.0.1:8080");//TODO obter de modo melhor a url
+//        WebClient client = WebClient.create("http://127.0.0.1:8080");//TODO obter de modo melhor a url
         return client.get()
                 .uri(BLOCKING_CONTROLLER_URI + "/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
