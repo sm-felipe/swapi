@@ -1,6 +1,6 @@
 package com.ame.swapi.service;
 
-import com.ame.swapi.entity.PlanetEntity;
+import com.ame.swapi.model.PlanetEntity;
 import com.ame.swapi.repository.PlanetRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Service;

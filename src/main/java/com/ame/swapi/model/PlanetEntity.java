@@ -1,4 +1,4 @@
-package com.ame.swapi.entity;
+package com.ame.swapi.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
