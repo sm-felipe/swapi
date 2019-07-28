@@ -8,6 +8,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service principal que interage com o modelo do {@link PlanetEntity}
+ */
 @Service
 public class PlanetService {
 
@@ -36,8 +39,14 @@ public class PlanetService {
         return planetRepository.findByName(name);
     }
 
-    public Optional<PlanetEntity> findById(Long id) {
-        return planetRepository.findById(id);
+    public Optional<PlanetDTO> findById(Long id) {
+        Optional<PlanetEntity> entity = planetRepository.findById(id);
+        if(entity.isPresent()) {
+            PlanetDTO convertedPlanet = new PlanetDTO();
+            BeanUtils.copyProperties(entity.get(), convertedPlanet);
+            return Optional.of(convertedPlanet);
+        }
+        return Optional.empty();
     }
 
     @Transactional
