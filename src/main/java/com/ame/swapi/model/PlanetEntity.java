@@ -2,12 +2,16 @@ package com.ame.swapi.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity(name = "Planet")
 public class PlanetEntity {
 
     @Id
+    @Column
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
     @Column
