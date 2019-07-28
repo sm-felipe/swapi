@@ -1,8 +1,10 @@
 package com.ame.swapi.service;
 
 import com.ame.swapi.model.PlanetEntity;
+import com.ame.swapi.model.dto.PlanetDTO;
 import com.ame.swapi.repository.PlanetRepository;
 import java.util.Optional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +18,10 @@ public class PlanetService {
     }
 
     @Transactional
-    public void save() {
-        //planetRepository.save()
+    public void save(PlanetDTO planetDTO) {
+        PlanetEntity newEntity = new PlanetEntity();
+        BeanUtils.copyProperties(planetDTO, newEntity);
+        planetRepository.save(newEntity);
     }
 
     public Iterable<PlanetEntity> findAllSalved() {
