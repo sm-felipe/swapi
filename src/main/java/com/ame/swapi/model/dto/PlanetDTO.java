@@ -10,6 +10,16 @@ public class PlanetDTO {
 
     private Integer appearingCount;
 
+    public PlanetDTO() {
+    }
+
+    public PlanetDTO(String name, String climate, String terrain, Integer appearingCount) {
+        this.name = name;
+        this.climate = climate;
+        this.terrain = terrain;
+        this.appearingCount = appearingCount;
+    }
+
     public String getName() {
         return name;
     }
