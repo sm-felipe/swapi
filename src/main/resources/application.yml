@@ -1,12 +1,16 @@
 spring:
-    datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        password: password
-        url: jdbc:mysql://localhost:3306/swapi_db
-        username: root
-        validation-query: SELECT 1
-    jpa:
-        properties:
-            org:
-                hibernate:
-                    flushMode: COMMIT
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: password
+    url: jdbc:mysql://localhost:3306/swapi_db
+    username: root
+    validation-query: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: update
+#    properties:
+#      org:
+#        hibernate:
+#          flushMode: COMMIT
+
+#TODO revisar E REMOVER
