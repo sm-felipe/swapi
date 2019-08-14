@@ -4,7 +4,11 @@ import com.ame.swapi.model.PlanetEntity;
 import com.ame.swapi.model.dto.PlanetDTO;
 import com.ame.swapi.repository.PlanetRepository;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +31,15 @@ public class PlanetService {
         planetRepository.save(newEntity);
     }
 
-    public Iterable<PlanetEntity> findAllSalved() {
-        return planetRepository.findAll();
+    public Stream<PlanetDTO> findAllPaged(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        Page<PlanetEntity> page = planetRepository.findAll(pageable);
+        return page.get().map(planetEntity -> {
+            PlanetDTO planetDTO = new PlanetDTO();
+            BeanUtils.copyProperties(planetEntity, planetDTO);
+            return planetDTO;
+        });
     }
 
     public Iterable<PlanetEntity> findAllAtStarWarsAPI() {

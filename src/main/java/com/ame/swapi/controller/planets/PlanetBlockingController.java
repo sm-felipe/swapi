@@ -2,6 +2,7 @@ package com.ame.swapi.controller.planets;
 
 import com.ame.swapi.model.dto.PlanetDTO;
 import com.ame.swapi.service.PlanetService;
+import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +41,11 @@ public class PlanetBlockingController {
     @ResponseBody
     public PlanetDTO findById(@PathVariable Long id) {
         return planetService.findById(id).orElse(null);
+    }
+
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Stream<PlanetDTO> findAllPaged() {//TODO receber como parâmetro os dados
+        return planetService.findAllPaged(0, 10);
     }
 
 }
