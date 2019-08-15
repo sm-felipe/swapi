@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,9 +44,10 @@ public class PlanetBlockingController {
         return planetService.findById(id).orElse(null);
     }
 
-    @GetMapping(value = "/", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Stream<PlanetDTO> findAllPaged() {//TODO receber como parâmetro os dados
-        return planetService.findAllPaged(0, 10);
+    @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    @ResponseBody
+    public Stream<PlanetDTO> findAllPaged(@RequestParam int pageNumber, @RequestParam int pageSize) {
+        return planetService.findAllPaged(pageNumber, pageNumber);
     }
 
 }
