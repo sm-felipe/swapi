@@ -47,7 +47,7 @@ public class PlanetBlockingController {
     @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     @ResponseBody
     public Stream<PlanetDTO> findAllPaged(@RequestParam int pageNumber, @RequestParam int pageSize) {
-        return planetService.findAllPaged(pageNumber, pageNumber);
+        return planetService.findAllPaged(pageNumber, pageSize);
     }
 
 }
