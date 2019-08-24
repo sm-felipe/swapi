@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -33,6 +35,11 @@ public class PlanetReactiveController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<PlanetDTO> findById(@PathVariable Long id) {
         return planetGateway.findById(id);
+    }
+
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Flux<PlanetDTO> list() {
+        return planetGateway.list();
     }
 
 }
