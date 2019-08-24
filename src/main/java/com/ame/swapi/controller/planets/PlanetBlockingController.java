@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller bloqueante para interações com o banco de dados
+ * Controller bloqueante para interacoes com o banco de dados
  */
 @RestController
 @RequestMapping(PlanetBlockingController.BLOCKING_CONTROLLER_URI)
 public class PlanetBlockingController {
 
-    public static final String PLANETS_URI = "planets";
+    static final String PLANETS_URI = "planets";
     public static final String BLOCKING_CONTROLLER_URI = "blocking/" + PLANETS_URI;
 
     private final PlanetService planetService;
