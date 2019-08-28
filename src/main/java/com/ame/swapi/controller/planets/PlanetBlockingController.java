@@ -35,7 +35,7 @@ public class PlanetBlockingController {
         this.planetService = planetService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@Valid @RequestBody PlanetDTO planetDTO) {
         planetService.save(planetDTO);
