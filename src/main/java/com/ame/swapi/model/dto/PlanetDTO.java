@@ -1,20 +1,25 @@
 package com.ame.swapi.model.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class PlanetDTO {
 
     @NotEmpty(message = "A name is needed")
+    @ApiModelProperty(dataType = "String",position = 1, example = "Aldeeran")
     private String name;
 
     @NotEmpty(message = "A climate is needed")
+    @ApiModelProperty(dataType = "String",position = 2, example = "Arid")
     private String climate;
 
     @NotEmpty(message = "A terrain type is needed")
+    @ApiModelProperty(dataType = "String",position = 3, example = "Mountains")
     private String terrain;
 
     @NotNull(message = "An appearing count is needed")
+    @ApiModelProperty(dataType = "Integer",position = 4, example = "3")
     private Integer appearingCount;
 
     public PlanetDTO() {
