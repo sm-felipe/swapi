@@ -1,5 +1,7 @@
 package com.ame.swapi.controller.planets;
 
+import static org.junit.Assert.assertNull;
+
 import com.ame.swapi.client.PlanetGateway;
 import com.ame.swapi.model.dto.PlanetDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 //@WebFluxTest
 @RunWith(MockitoJUnitRunner.class)
@@ -30,7 +33,7 @@ public class PlanetReactiveControllerTest {
     public void init() {
         String baseUrl = mockWebServer.url("/").toString();
         WebClient client = WebClient.create(baseUrl);
-        planetReactiveController = new PlanetReactiveController(new PlanetGateway(client, baseUrl));
+        planetReactiveController = new PlanetReactiveController(new PlanetGateway(client, baseUrl, client));
     }
 
     @Test
@@ -74,5 +77,18 @@ public class PlanetReactiveControllerTest {
 
         Flux<PlanetDTO> result = planetReactiveController.list();
         result.subscribe(System.out::println);
+    }
+
+    @Test
+    public void delete() {
+
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+        );
+
+        Mono deleted = planetReactiveController.deleteById(1L);
+        Object deleteReturn = deleted.block();
+        assertNull(deleteReturn);
     }
 }
