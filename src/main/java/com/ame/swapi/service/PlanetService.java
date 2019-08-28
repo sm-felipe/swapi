@@ -6,11 +6,14 @@ import com.ame.swapi.repository.PlanetRepository;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Service principal que interage com o modelo do {@link PlanetEntity}
@@ -61,7 +64,11 @@ public class PlanetService {
 
     @Transactional
     public void delete(Long id) {
-        planetRepository.deleteById(id);
+        try {
+            planetRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Planet " + id + " didnt exist", e);
+        }
     }
 
 }
