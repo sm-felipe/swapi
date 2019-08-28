@@ -29,11 +29,11 @@ public class PlanetReactiveController {
     }
 
     @PostMapping
-    public Mono<PlanetDTO> create(@Valid @RequestBody PlanetDTO planetDTO) {
-        return planetGateway.save(planetDTO);
+    public Mono<Long> create(@Valid @RequestBody PlanetDTO planetDTO) {
+        return planetGateway.create(planetDTO);
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE, params = {})
+    @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<PlanetDTO> list() {
         return planetGateway.list();
     }

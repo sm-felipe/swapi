@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,11 +37,12 @@ public class PlanetGateway {
         this.blockingAppUrl = blockingAppUrl;
     }
 
-    public Mono<PlanetDTO> save(PlanetDTO planetDTO) {
-
-//        WebClient client = WebClient.create("locahost");
-//        client.post().uri(PlanetBlockingController.BLOCKING_CONTROLLER_URI).
-        return null;
+    public Mono<Long> create(PlanetDTO planetDTO) {
+        return client.post()
+                .uri(BLOCKING_CONTROLLER_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(planetDTO))
+                .retrieve().bodyToMono(Long.class);
     }
 
     public Mono<PlanetDTO> findById(Long id) {
