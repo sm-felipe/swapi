@@ -41,6 +41,12 @@ public class PlanetBlockingController {
         planetService.save(planetDTO);
     }
 
+    @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE, params = {"pageNumber", "pageSize"})
+    @ResponseBody
+    public Stream<PlanetDTO> findAllPaged(@RequestParam int pageNumber, @RequestParam int pageSize) {
+        return planetService.findAllPaged(pageNumber, pageSize);
+    }
+
     @GetMapping(value = "/{id}", produces =  MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<PlanetDTO> findById(@PathVariable Long id) {
@@ -49,10 +55,12 @@ public class PlanetBlockingController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, params = "name")
     @ResponseBody
-    public Stream<PlanetDTO> findAllPaged(@RequestParam int pageNumber, @RequestParam int pageSize) {
-        return planetService.findAllPaged(pageNumber, pageSize);
+    public ResponseEntity<PlanetDTO> findByName(@RequestParam String name) {
+        Optional<PlanetDTO> planet = planetService.findByName(name);
+        return planet.map(planetDTO -> new ResponseEntity<>(planetDTO, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping(value = "/{id}")

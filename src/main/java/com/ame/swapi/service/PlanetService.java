@@ -42,22 +42,20 @@ public class PlanetService {
         });
     }
 
-    public Iterable<PlanetEntity> findAllAtStarWarsAPI() {
-        return null;
-    }
-
-    public Optional<PlanetEntity> findByName(String name) {
-        return planetRepository.findByName(name);
-    }
-
     public Optional<PlanetDTO> findById(Long id) {
         Optional<PlanetEntity> entity = planetRepository.findById(id);
-        if(entity.isPresent()) {
-            PlanetDTO convertedPlanet = new PlanetDTO();
-            BeanUtils.copyProperties(entity.get(), convertedPlanet);
-            return Optional.of(convertedPlanet);
-        }
-        return Optional.empty();
+        return entity.flatMap(this::convertToDTO);
+    }
+
+    public Optional<PlanetDTO> findByName(String name) {
+        Optional<PlanetEntity> entity = planetRepository.findByName(name);
+        return entity.flatMap(this::convertToDTO);
+    }
+
+    private Optional<PlanetDTO> convertToDTO(PlanetEntity entity) {
+        PlanetDTO convertedPlanet = new PlanetDTO();
+        BeanUtils.copyProperties(entity, convertedPlanet);
+        return Optional.of(convertedPlanet);
     }
 
     @Transactional
