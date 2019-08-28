@@ -1,6 +1,7 @@
 package com.ame.swapi.client;
 
 import static com.ame.swapi.controller.planets.PlanetBlockingController.BLOCKING_CONTROLLER_URI;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.ame.swapi.model.dto.PlanetDTO;
 import java.util.List;
@@ -12,9 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 /**
@@ -47,6 +48,8 @@ public class PlanetGateway {
                 .uri(BLOCKING_CONTROLLER_URI + "/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
+                .onStatus(NOT_FOUND::equals,
+                        clientResponse -> Mono.error(new ResponseStatusException(NOT_FOUND, "Could not find the planet " + id)))
                 .bodyToMono(PlanetDTO.class);
     }
 
@@ -58,7 +61,7 @@ public class PlanetGateway {
 
             while (true) {
                 ResponseEntity<List<PlanetDTO>> response = getPage(page);
-                if(response.getStatusCode().is2xxSuccessful()) {
+                if (response.getStatusCode().is2xxSuccessful()) {
 
                     List<PlanetDTO> pagePlanets = response.getBody();
                     if (pagePlanets != null && !pagePlanets.isEmpty()) {
@@ -69,8 +72,8 @@ public class PlanetGateway {
                     }
 
                     page++;
-                } else if(response.getStatusCode().isError()) {
-                    fluxSink.error(new IllegalStateException("blocking app returned " +response.getStatusCode()));
+                } else if (response.getStatusCode().isError()) {
+                    fluxSink.error(new IllegalStateException("blocking app returned " + response.getStatusCode()));
                 }//TODO tratar outros estados
             }
         });
@@ -85,7 +88,7 @@ public class PlanetGateway {
                 .queryParam("pageNumber", page).toUriString();
         return restTemplate.exchange(url, HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<PlanetDTO>>() {
-        });
+                });
     }
 
     public Mono deleteById(Long id) {
