@@ -1,5 +1,6 @@
 package com.ame.swapi.controller.planets;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import com.ame.swapi.client.PlanetGateway;
@@ -14,8 +15,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -37,26 +40,37 @@ public class PlanetReactiveControllerTest {
     }
 
     @Test
-    public void findById() throws JsonProcessingException {
-        PlanetDTO planetDTO = new PlanetDTO("name", "clinamte", "dsfs", 1);
+    public void findById_whenPlanetExists_ReturnsPlanet() throws JsonProcessingException {
+        PlanetDTO expectedPlanet = new PlanetDTO("name", "temperate", "mountains", 1);
 
         mockWebServer.enqueue(
                 new MockResponse()
                         .setResponseCode(200)
                         .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(planetDTO))
+                        .setBody(objectMapper.writeValueAsString(expectedPlanet))
         );
 
-        PlanetDTO block = planetReactiveController.findById(1L).block();
-        System.out.println(block);
+        PlanetDTO retrievedPlanet = planetReactiveController.findById(1L).block();
 
+        assertEquals(expectedPlanet, retrievedPlanet);
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void findById_whenPlanetDoesntExist_Returns404() {
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(HttpStatus.NOT_FOUND.value())
+                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        planetReactiveController.findById(1L).block();
     }
 
     @Test
     public void listPlanets() throws JsonProcessingException {
 
-        PlanetDTO planetDTO = new PlanetDTO("name1", "clinamte", "dsfs", 1);
-        PlanetDTO planetDTO2 = new PlanetDTO("name2", "clinamte", "dsfs", 1);
+        PlanetDTO planetDTO = new PlanetDTO("name1", "climate1", "swamps", 1);
+        PlanetDTO planetDTO2 = new PlanetDTO("name2", "climate1", "swamps", 2);
         List<PlanetDTO> planetList = List.of(planetDTO, planetDTO2);
 
         //first page gives some elements
@@ -76,6 +90,7 @@ public class PlanetReactiveControllerTest {
         );
 
         Flux<PlanetDTO> result = planetReactiveController.list();
+        result.collectList();
         result.subscribe(System.out::println);
     }
 

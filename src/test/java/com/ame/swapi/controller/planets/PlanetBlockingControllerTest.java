@@ -2,6 +2,7 @@ package com.ame.swapi.controller.planets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -34,12 +35,39 @@ public class PlanetBlockingControllerTest {
     PlanetBlockingController planetBlockingController;
 
     @Test
-    public void findById() {
-        when(planetRepository.findById(TEST_ID)).thenReturn(Optional.of(new PlanetEntity()));
+    public void findById_whenPlanetExists_ReturnsPlanet() {
+        PlanetEntity expectedPlanet = createTestPlanet();
+        when(planetRepository.findById(TEST_ID)).thenReturn(Optional.of(expectedPlanet));
 
-        ResponseEntity<PlanetDTO> byId = planetBlockingController.findById(TEST_ID);
+        ResponseEntity<PlanetDTO> response = planetBlockingController.findById(TEST_ID);
+        PlanetDTO retrievedPlanet = response.getBody();
 
-        assertNotNull(byId.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(retrievedPlanet);
+        assertEquals(expectedPlanet.getName(), retrievedPlanet.getName());
+        assertEquals(expectedPlanet.getClimate(), retrievedPlanet.getClimate());
+        assertEquals(expectedPlanet.getTerrain(), retrievedPlanet.getTerrain());
+        assertEquals(expectedPlanet.getAppearingCount(), retrievedPlanet.getAppearingCount());
+    }
+
+    private PlanetEntity createTestPlanet() {
+        PlanetEntity expectedPlanet = new PlanetEntity();
+        expectedPlanet.setId(1L);
+        expectedPlanet.setClimate("arid");
+        expectedPlanet.setTerrain("mountains");
+        expectedPlanet.setAppearingCount(3);
+        return expectedPlanet;
+    }
+
+    @Test
+    public void findById_whenPlanetDoesntExist_Returns404() {
+        when(planetRepository.findById(TEST_ID)).thenReturn(Optional.empty());
+
+        ResponseEntity<PlanetDTO> response = planetBlockingController.findById(TEST_ID);
+        PlanetDTO retrievedPlanet = response.getBody();
+
+        assertNull(retrievedPlanet);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
