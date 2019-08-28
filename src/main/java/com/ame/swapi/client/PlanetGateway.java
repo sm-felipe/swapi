@@ -88,4 +88,9 @@ public class PlanetGateway {
         });
     }
 
+    public Mono deleteById(Long id) {
+        return client.delete()
+                .uri(BLOCKING_CONTROLLER_URI + "/{id}", id)
+                .retrieve().bodyToMono(Object.class);
+    }
 }
