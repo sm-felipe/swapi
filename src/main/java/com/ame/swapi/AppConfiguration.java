@@ -11,10 +11,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class AppConfiguration {
 
     @Value("${blocking-app-url}")
-    String blockingAppUrl;
+    private String blockingAppURL;
 
-    @Bean
-    public WebClient client() {
-       return WebClient.create(blockingAppUrl);
+    @Value("${swapi-url}")
+    private String swapiURL;
+
+    @Bean(name = "blockingAppClient")
+    public WebClient blockingAppClient() {
+       return WebClient.create(blockingAppURL);
+    }
+
+    @Bean(name = "swapiClient")
+    public WebClient swapiClient() {
+        return WebClient.create(swapiURL);
     }
 }
