@@ -64,8 +64,9 @@ public class PlanetBlockingController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         planetService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
