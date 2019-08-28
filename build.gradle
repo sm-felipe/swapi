@@ -4,6 +4,10 @@ plugins {
 }
 
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+
+mainClassName = 'com.ame.swapi.SwapiApplication'
+
 
 group = 'com.ame'
 version = '0.0.1-SNAPSHOT'
