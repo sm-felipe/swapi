@@ -5,6 +5,7 @@ import static com.ame.swapi.controller.planets.TestCommons.TEST_PLANET_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import com.ame.swapi.repository.PlanetRepository;
 import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,6 +52,12 @@ public class PlanetBlockingControllerTest {
         assertEquals(expectedPlanet.getClimate(), retrievedPlanet.getClimate());
         assertEquals(expectedPlanet.getTerrain(), retrievedPlanet.getTerrain());
         assertEquals(expectedPlanet.getAppearingCount(), retrievedPlanet.getAppearingCount());
+    }
+
+    private PlanetDTO createTestPlanetDTO(PlanetEntity testPlanet) {
+        PlanetDTO planetDTO = new PlanetDTO();
+        BeanUtils.copyProperties(testPlanet, planetDTO);
+        return planetDTO;
     }
 
     private PlanetEntity createTestPlanet() {
@@ -97,6 +105,16 @@ public class PlanetBlockingControllerTest {
 
         assertNull(retrievedPlanet);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void create_whenPlanetDoesntExist_returns200() {
+        PlanetEntity testPlanet = createTestPlanet();
+        when(planetRepository.save(any(PlanetEntity.class))).thenReturn(testPlanet);
+
+        Long newId = planetBlockingController.create(createTestPlanetDTO(testPlanet));
+
+        assertEquals(testPlanet.getId(), newId);
     }
 
     @Test
