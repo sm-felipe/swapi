@@ -47,7 +47,7 @@ public class PlanetBlockingController {
 
     @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE, params = {"pageNumber", "pageSize"})
     @ResponseBody
-    @ApiOperation(value = "lists all saved planets")
+    @ApiOperation(value = "lists a page of planets")
     public Stream<PlanetDTO> findAllPaged(@RequestParam int pageNumber, @RequestParam int pageSize) {
         return planetService.findAllPaged(pageNumber, pageSize);
     }
