@@ -15,7 +15,11 @@ import static org.mockito.Mockito.when;
 import com.ame.swapi.model.PlanetEntity;
 import com.ame.swapi.model.dto.PlanetDTO;
 import com.ame.swapi.repository.PlanetRepository;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeanUtils;
@@ -23,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -102,6 +108,30 @@ public class PlanetBlockingControllerTest {
         Long newId = planetBlockingController.create(createTestPlanetDTO(testPlanet));
 
         assertEquals(testPlanet.getId(), newId);
+    }
+
+    @Test
+    public void findAllPaged_whenPageExists() {
+        PlanetEntity testPlanet = createTestPlanet();
+        List<PlanetEntity> planetEntities = Collections.singletonList(testPlanet);
+        when(planetRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(planetEntities));
+
+        Stream<PlanetDTO> page = planetBlockingController.findAllPaged(1, 10);
+        List<PlanetDTO> resultList = page.collect(Collectors.toList());
+        assertEquals(planetEntities.size(), resultList.size());
+        assertEquals(testPlanet.getName(), resultList.get(0).getName());
+        assertEquals(testPlanet.getTerrain(), resultList.get(0).getTerrain());
+        assertEquals(testPlanet.getClimate(), resultList.get(0).getClimate());
+        assertEquals(testPlanet.getAppearingCount(), resultList.get(0).getAppearingCount());
+    }
+
+    @Test
+    public void findAllPaged_whenPageFindsNothing() {
+        when(planetRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
+
+        Stream<PlanetDTO> page = planetBlockingController.findAllPaged(1, 10);
+        List<PlanetDTO> resultList = page.collect(Collectors.toList());
+        assertEquals(0, resultList.size());
     }
 
     @Test

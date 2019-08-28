@@ -5,6 +5,7 @@ import static com.ame.swapi.controller.planets.TestCommons.TEST_PLANET_NAME;
 import static com.ame.swapi.controller.planets.TestCommons.createTestPlanetDTO;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import com.ame.swapi.client.PlanetGateway;
 import com.ame.swapi.model.dto.PlanetDTO;
@@ -111,7 +112,7 @@ public class PlanetReactiveControllerTest {
     }
 
     @Test
-    public void listPlanets() throws JsonProcessingException {
+    public void list_With2Pages() throws JsonProcessingException {
 
         PlanetDTO planetDTO = new PlanetDTO("name1", "climate1", "swamps", 1);
         PlanetDTO planetDTO2 = new PlanetDTO("name2", "climate1", "swamps", 2);
@@ -134,8 +135,27 @@ public class PlanetReactiveControllerTest {
         );
 
         Flux<PlanetDTO> result = planetReactiveController.list();
-        result.collectList();
-        result.subscribe(System.out::println);
+        List<PlanetDTO> resultList = result.collectList().block();
+        assert resultList != null;
+        assertEquals(2, resultList.size());
+        assertEquals(planetDTO, resultList.get(0));
+        assertEquals(planetDTO2, resultList.get(1));
+    }
+
+    @Test
+    public void list_WithEmptyFirstPage() throws JsonProcessingException {
+
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_STREAM_JSON_VALUE)
+                        .setBody(objectMapper.writeValueAsString(List.of()))
+        );
+
+        Flux<PlanetDTO> result = planetReactiveController.list();
+        List<PlanetDTO> resultList = result.collectList().block();
+        assert resultList != null;
+        assertTrue(resultList.isEmpty());
     }
 
     @Test
