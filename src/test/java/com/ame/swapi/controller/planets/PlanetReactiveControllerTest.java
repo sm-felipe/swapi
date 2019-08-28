@@ -11,6 +11,7 @@ import com.ame.swapi.client.PlanetGateway;
 import com.ame.swapi.model.dto.PlanetDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.List;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
+import org.synchronoss.cloud.nio.multipart.util.IOUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -112,7 +114,7 @@ public class PlanetReactiveControllerTest {
     }
 
     @Test
-    public void list_With2Pages() throws JsonProcessingException {
+    public void list_with2Pages() throws JsonProcessingException {
 
         PlanetDTO planetDTO = new PlanetDTO("name1", "climate1", "swamps", 1);
         PlanetDTO planetDTO2 = new PlanetDTO("name2", "climate1", "swamps", 2);
@@ -143,7 +145,7 @@ public class PlanetReactiveControllerTest {
     }
 
     @Test
-    public void list_WithEmptyFirstPage() throws JsonProcessingException {
+    public void list_withEmptyFirstPage() throws JsonProcessingException {
 
         mockWebServer.enqueue(
                 new MockResponse()
@@ -156,6 +158,21 @@ public class PlanetReactiveControllerTest {
         List<PlanetDTO> resultList = result.collectList().block();
         assert resultList != null;
         assertTrue(resultList.isEmpty());
+    }
+
+    @Test
+    public void listFromSWAPI() throws IOException {
+
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(IOUtils.inputStreamAsString(this.getClass().getResourceAsStream("/swapi_return.json" ), "utf-8"))
+        );
+
+        Flux<PlanetDTO> planetDTOFlux = planetReactiveController.listFromSWAPI();
+        List<PlanetDTO> swapiPlanets = planetDTOFlux.collectList().block();
+        assertEquals(10, swapiPlanets.size());
     }
 
     @Test
