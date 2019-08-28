@@ -4,7 +4,13 @@ import static com.ame.swapi.controller.planets.PlanetBlockingController.BLOCKING
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.ame.swapi.model.dto.PlanetDTO;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -28,17 +34,23 @@ public class PlanetGateway {
 
     private static final int PAGE_SIZE = 10;
 
-    private final WebClient client;
+    private final WebClient blockingAppClient;
 
     private final String blockingAppUrl;
 
-    public PlanetGateway(WebClient client, @Value("${blocking-app-url}") String blockingAppUrl) {
-        this.client = client;
-        this.blockingAppUrl = blockingAppUrl;
+    private final WebClient swapiClient;
+
+    public PlanetGateway(@Qualifier("blockingAppClient") WebClient blockingAppClient,
+                         @Value("${blocking-app-url}") String blockingAppURL,
+                         @Qualifier("swapiClient") WebClient swapiClient
+    ) {
+        this.blockingAppClient = blockingAppClient;
+        this.blockingAppUrl = blockingAppURL;
+        this.swapiClient = swapiClient;
     }
 
     public Mono<Long> create(PlanetDTO planetDTO) {
-        return client.post()
+        return blockingAppClient.post()
                 .uri(BLOCKING_CONTROLLER_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(planetDTO))
@@ -46,7 +58,7 @@ public class PlanetGateway {
     }
 
     public Mono<PlanetDTO> findById(Long id) {
-        return client.get()
+        return blockingAppClient.get()
                 .uri(BLOCKING_CONTROLLER_URI + "/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -56,7 +68,7 @@ public class PlanetGateway {
     }
 
     public Mono<PlanetDTO> findByName(String name) {
-       return client.get()
+        return blockingAppClient.get()
                 .uri(BLOCKING_CONTROLLER_URI + "/?name={name}", name)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -103,10 +115,40 @@ public class PlanetGateway {
     }
 
     public Mono deleteById(Long id) {
-        return client.delete()
+        return blockingAppClient.delete()
                 .uri(BLOCKING_CONTROLLER_URI + "/{id}", id)
                 .retrieve().bodyToMono(Object.class);
     }
 
+    public Flux<PlanetDTO> listFromSWAPI() {
+        return swapiClient.get()
+                .uri("planets/?format=json")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(String.class)
+                .flatMapMany(this::convertToPlanetDTOFlux);
+    }
 
+    private Flux<PlanetDTO> convertToPlanetDTOFlux(String apiResult) {
+
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        return Flux.create(fluxSink -> {
+            try {
+                ObjectNode value = objectMapper.readValue(apiResult, ObjectNode.class);
+                JsonNode results = value.get("results");
+                assert results.isArray();
+                for (JsonNode result : results) {
+                    PlanetDTO planetDTO = objectMapper.treeToValue(result, PlanetDTO.class);
+                    JsonNode films = result.get("films");
+                    assert films.isArray();
+                    planetDTO.setAppearingCount(films.size());
+                    fluxSink.next(planetDTO);
+                }
+                fluxSink.complete();
+            } catch (IOException e) {
+                fluxSink.error(e);
+            }
+        });
+    }
 }

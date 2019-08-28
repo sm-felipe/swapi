@@ -53,4 +53,9 @@ public class PlanetReactiveController {
         return planetGateway.deleteById(id);
     }
 
+    @GetMapping(params = "swapi", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Flux<PlanetDTO> listFromSWAPI() {
+        return planetGateway.listFromSWAPI();
+    }
+
 }
