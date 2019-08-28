@@ -1,13 +1,20 @@
 package com.ame.swapi.model.dto;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class PlanetDTO {
 
+    @NotEmpty(message = "A name is needed")
     private String name;
 
+    @NotEmpty(message = "A climate is needed")
     private String climate;
 
+    @NotEmpty(message = "A terrain type is needed")
     private String terrain;
 
+    @NotNull(message = "An appearing count is needed")
     private Integer appearingCount;
 
     public PlanetDTO() {
