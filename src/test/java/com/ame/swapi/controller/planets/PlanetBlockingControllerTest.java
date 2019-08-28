@@ -2,6 +2,8 @@ package com.ame.swapi.controller.planets;
 
 import static com.ame.swapi.controller.planets.TestCommons.TEST_ID;
 import static com.ame.swapi.controller.planets.TestCommons.TEST_PLANET_NAME;
+import static com.ame.swapi.controller.planets.TestCommons.createTestPlanet;
+import static com.ame.swapi.controller.planets.TestCommons.createTestPlanetDTO;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -52,21 +54,6 @@ public class PlanetBlockingControllerTest {
         assertEquals(expectedPlanet.getClimate(), retrievedPlanet.getClimate());
         assertEquals(expectedPlanet.getTerrain(), retrievedPlanet.getTerrain());
         assertEquals(expectedPlanet.getAppearingCount(), retrievedPlanet.getAppearingCount());
-    }
-
-    private PlanetDTO createTestPlanetDTO(PlanetEntity testPlanet) {
-        PlanetDTO planetDTO = new PlanetDTO();
-        BeanUtils.copyProperties(testPlanet, planetDTO);
-        return planetDTO;
-    }
-
-    private PlanetEntity createTestPlanet() {
-        PlanetEntity expectedPlanet = new PlanetEntity();
-        expectedPlanet.setId(1L);
-        expectedPlanet.setClimate("arid");
-        expectedPlanet.setTerrain("mountains");
-        expectedPlanet.setAppearingCount(3);
-        return expectedPlanet;
     }
 
     @Test

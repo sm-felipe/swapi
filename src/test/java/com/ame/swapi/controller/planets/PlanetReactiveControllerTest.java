@@ -2,6 +2,7 @@ package com.ame.swapi.controller.planets;
 
 import static com.ame.swapi.controller.planets.TestCommons.TEST_ID;
 import static com.ame.swapi.controller.planets.TestCommons.TEST_PLANET_NAME;
+import static com.ame.swapi.controller.planets.TestCommons.createTestPlanetDTO;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -93,6 +94,20 @@ public class PlanetReactiveControllerTest {
         );
 
         planetReactiveController.findByName(TEST_PLANET_NAME).block();
+    }
+
+    @Test
+    public void create_whenPlanetDoesntExist_returns200() {
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody("1")
+        );
+
+        Mono<Long> newId = planetReactiveController.create(createTestPlanetDTO());
+
+        assertEquals(Long.valueOf(1), newId.block());
     }
 
     @Test
