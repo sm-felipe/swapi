@@ -1,5 +1,7 @@
 package com.ame.swapi.controller.planets;
 
+import static com.ame.swapi.controller.planets.TestCommons.TEST_ID;
+import static com.ame.swapi.controller.planets.TestCommons.TEST_PLANET_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -26,7 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 public class PlanetBlockingControllerTest {
 
-    private static final long TEST_ID = 1L;
+
     @MockBean
     private PlanetRepository planetRepository;
 
@@ -64,6 +66,33 @@ public class PlanetBlockingControllerTest {
         when(planetRepository.findById(TEST_ID)).thenReturn(Optional.empty());
 
         ResponseEntity<PlanetDTO> response = planetBlockingController.findById(TEST_ID);
+        PlanetDTO retrievedPlanet = response.getBody();
+
+        assertNull(retrievedPlanet);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void findByName_whenPlanetExists_ReturnsPlanet() {
+        PlanetEntity expectedPlanet = createTestPlanet();
+        when(planetRepository.findByName(TEST_PLANET_NAME)).thenReturn(Optional.of(expectedPlanet));
+
+        ResponseEntity<PlanetDTO> response = planetBlockingController.findByName(TEST_PLANET_NAME);
+        PlanetDTO retrievedPlanet = response.getBody();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(retrievedPlanet);
+        assertEquals(expectedPlanet.getName(), retrievedPlanet.getName());
+        assertEquals(expectedPlanet.getClimate(), retrievedPlanet.getClimate());
+        assertEquals(expectedPlanet.getTerrain(), retrievedPlanet.getTerrain());
+        assertEquals(expectedPlanet.getAppearingCount(), retrievedPlanet.getAppearingCount());
+    }
+
+    @Test
+    public void findByName_whenPlanetDoesntExist_Returns404() {
+        when(planetRepository.findByName(TEST_PLANET_NAME)).thenReturn(Optional.empty());
+
+        ResponseEntity<PlanetDTO> response = planetBlockingController.findByName(TEST_PLANET_NAME);
         PlanetDTO retrievedPlanet = response.getBody();
 
         assertNull(retrievedPlanet);

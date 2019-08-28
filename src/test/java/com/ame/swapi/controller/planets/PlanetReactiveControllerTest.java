@@ -1,5 +1,7 @@
 package com.ame.swapi.controller.planets;
 
+import static com.ame.swapi.controller.planets.TestCommons.TEST_ID;
+import static com.ame.swapi.controller.planets.TestCommons.TEST_PLANET_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -50,7 +52,7 @@ public class PlanetReactiveControllerTest {
                         .setBody(objectMapper.writeValueAsString(expectedPlanet))
         );
 
-        PlanetDTO retrievedPlanet = planetReactiveController.findById(1L).block();
+        PlanetDTO retrievedPlanet = planetReactiveController.findById(TEST_ID).block();
 
         assertEquals(expectedPlanet, retrievedPlanet);
     }
@@ -63,7 +65,34 @@ public class PlanetReactiveControllerTest {
                         .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         );
 
-        planetReactiveController.findById(1L).block();
+        planetReactiveController.findById(TEST_ID).block();
+    }
+
+    @Test
+    public void findByName_whenPlanetExists_ReturnsPlanet() throws JsonProcessingException {
+        PlanetDTO expectedPlanet = new PlanetDTO("name", "temperate", "mountains", 1);
+
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(objectMapper.writeValueAsString(expectedPlanet))
+        );
+
+        PlanetDTO retrievedPlanet = planetReactiveController.findByName(TEST_PLANET_NAME).block();
+
+        assertEquals(expectedPlanet, retrievedPlanet);
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void findByName_whenPlanetDoesntExist_Returns404() {
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setResponseCode(HttpStatus.NOT_FOUND.value())
+                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        planetReactiveController.findByName(TEST_PLANET_NAME).block();
     }
 
     @Test
