@@ -98,7 +98,7 @@ public class PlanetGateway {
                     page++;
                 } else if (response.getStatusCode().isError()) {
                     fluxSink.error(new IllegalStateException("blocking app returned " + response.getStatusCode()));
-                }//TODO tratar outros estados
+                }
             }
         });
     }

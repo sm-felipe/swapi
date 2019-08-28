@@ -8,12 +8,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#    properties:
-#      org:
-#        hibernate:
-#          flushMode: COMMIT
+
 
 blocking-app-url: "http://127.0.0.1:8080"
 swapi-url: "https://swapi.co/api/"
 
-#TODO revisar E REMOVER
