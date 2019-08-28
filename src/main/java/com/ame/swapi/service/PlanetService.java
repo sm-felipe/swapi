@@ -25,10 +25,11 @@ public class PlanetService {
     }
 
     @Transactional
-    public void save(PlanetDTO planetDTO) {
+    public Long save(PlanetDTO planetDTO) {
         PlanetEntity newEntity = new PlanetEntity();
         BeanUtils.copyProperties(planetDTO, newEntity);
-        planetRepository.save(newEntity);
+        PlanetEntity savedPlanet = planetRepository.save(newEntity);
+        return savedPlanet.getId();
     }
 
     public Stream<PlanetDTO> findAllPaged(int pageNumber, int pageSize) {

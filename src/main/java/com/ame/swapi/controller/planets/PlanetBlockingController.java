@@ -37,8 +37,8 @@ public class PlanetBlockingController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@Valid @RequestBody PlanetDTO planetDTO) {
-        planetService.save(planetDTO);
+    public Long create(@Valid @RequestBody PlanetDTO planetDTO) {
+        return planetService.save(planetDTO);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE, params = {"pageNumber", "pageSize"})
