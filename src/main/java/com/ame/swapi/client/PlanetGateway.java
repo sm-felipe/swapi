@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -137,11 +138,11 @@ public class PlanetGateway {
             try {
                 ObjectNode value = objectMapper.readValue(apiResult, ObjectNode.class);
                 JsonNode results = value.get("results");
-                assert results.isArray();
+                Assert.isTrue(results.isArray(), "swapi results is not an array");
                 for (JsonNode result : results) {
                     PlanetDTO planetDTO = objectMapper.treeToValue(result, PlanetDTO.class);
                     JsonNode films = result.get("films");
-                    assert films.isArray();
+                    Assert.isTrue(films.isArray(), "swapi films for planet " + planetDTO + " is not an array");
                     planetDTO.setAppearingCount(films.size());
                     fluxSink.next(planetDTO);
                 }
