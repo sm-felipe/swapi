@@ -2,10 +2,12 @@ package com.ame.swapi.controller.planets;
 
 import com.ame.swapi.model.dto.PlanetDTO;
 import com.ame.swapi.service.PlanetService;
+import java.util.Optional;
 import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,8 +43,10 @@ public class PlanetBlockingController {
 
     @GetMapping(value = "/{id}", produces =  MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public PlanetDTO findById(@PathVariable Long id) {
-        return planetService.findById(id).orElse(null);
+    public ResponseEntity<PlanetDTO> findById(@PathVariable Long id) {
+        Optional<PlanetDTO> planet = planetService.findById(id);
+        return planet.map(planetDTO -> new ResponseEntity<>(planetDTO, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
