@@ -49,10 +49,19 @@ public class PlanetGateway {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(NOT_FOUND::equals,
-                        clientResponse -> Mono.error(new ResponseStatusException(NOT_FOUND, "Could not find the planet " + id)))
+                        clientResponse -> Mono.error(new ResponseStatusException(NOT_FOUND, "Could not find the planet with id " + id)))
                 .bodyToMono(PlanetDTO.class);
     }
 
+    public Mono<PlanetDTO> findByName(String name) {
+       return client.get()
+                .uri(BLOCKING_CONTROLLER_URI + "/?name={name}", name)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(NOT_FOUND::equals,
+                        clientResponse -> Mono.error(new ResponseStatusException(NOT_FOUND, "Could not find the planet with name " + name)))
+                .bodyToMono(PlanetDTO.class);
+    }
 
     public Flux<PlanetDTO> list() {
 
@@ -96,4 +105,6 @@ public class PlanetGateway {
                 .uri(BLOCKING_CONTROLLER_URI + "/{id}", id)
                 .retrieve().bodyToMono(Object.class);
     }
+
+
 }
